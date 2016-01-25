@@ -462,6 +462,10 @@ describe PostRank::URI do
       PostRank::URI.valid?('http://президент.рф').should be(true)
     end
 
+    it 'marks an incomplete protocol as invalid' do
+      PostRank::URI.valid?('ttp://google.com').should be(false)
+    end
+
     it 'marks punycode domain domain as valid' do
       PostRank::URI.valid?('xn--d1abbgf6aiiy.xn--p1ai').should be(true)
     end
