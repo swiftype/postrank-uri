@@ -260,6 +260,10 @@ module PostRank
         is_valid = PublicSuffix.valid?(Addressable::IDNA.to_unicode(host))
       end
 
+      if is_valid
+        is_valid = !!cleaned_uri.request_uri
+      end
+
       is_valid
     end
   end
