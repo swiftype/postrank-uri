@@ -152,7 +152,7 @@ module PostRank
     # interpreted as UTF-8.
     def unescape_unreserved(uri)
       u = parse(uri)
-      u.query = u.query.tr('+', ' ') if u.query
+
       str = u.to_s.force_encoding("ASCII-8BIT").gsub(URIREGEX[:unescape]) do |code|
         next code if ENCODED_RESERVED_CHARS.include?(code.upcase)
 
