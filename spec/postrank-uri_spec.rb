@@ -71,7 +71,6 @@ describe PostRank::URI do
 
     it "should not unescape reserved characters" do
       expect(uu("example.com/what%3F")).to eq ("http://example.com/what%3F")
-      expect(uu("example.com/what?query=some+thing")).to eq("http://example.com/what?query=some+thing")
     end
 
     it "should unescape unreserved characters" do
