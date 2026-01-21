@@ -197,8 +197,8 @@ describe PostRank::URI do
       end
 
       it "removes PHPSESSID parameter" do
-        expect(c('http://www.nachi.org/forum?PHPSESSID=9ee2fb10b7274ef2b15d1d4006b8c8dd')).to eq('http://www.nachi.org/forum?')
-        expect(c('http://www.nachi.org/forum/?PHPSESSID=9ee2fb10b7274ef2b15d1d4006b8c8dd')).to eq('http://www.nachi.org/forum/?')
+        expect(c('http://www.nachi.org/forum?PHPSESSID=9ee2fb10b7274ef2b15d1d4006b8c8dd')).to eq('http://www.nachi.org/forum')
+        expect(c('http://www.nachi.org/forum/?PHPSESSID=9ee2fb10b7274ef2b15d1d4006b8c8dd')).to eq('http://www.nachi.org/forum/')
         expect(c('http://www.nachi.org/forum?id=123&PHPSESSID=9ee2fb10b7274ef2b15d1d4006b8c8dd')).to eq('http://www.nachi.org/forum?id=123')
       end
 
