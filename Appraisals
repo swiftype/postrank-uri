@@ -17,3 +17,7 @@ end
 appraise "addressable-2.5" do
   gem "addressable", "~> 2.5.0"
 end
+
+appraise "addressable-2.8" do
+  gem "addressable", "~> 2.8.8"
+end

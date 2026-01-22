@@ -16,12 +16,15 @@ module Addressable
     def normalized_query
       @normalized_query ||= (begin
         if self.query && self.query.strip != ''
-          (self.query.strip.split("&", -1).map do |pair|
-            Addressable::URI.normalize_component(
+          normalized_pairs = self.query.strip.split("&", -1).map do |pair|
+            component = Addressable::URI.normalize_component(
               pair,
               Addressable::URI::CharacterClasses::QUERY.sub("\\&", "")
             )
-          end).join("&")
+            # Addressable 2.8.8 compatibility: normalize_component may return Module (NONE)
+            component.is_a?(Module) ? pair : component
+          end
+          normalized_pairs.join("&")
         else
           nil
         end
@@ -137,7 +140,9 @@ module PostRank
 
     def unescape(uri)
       u = parse(uri)
-      u.query = u.query.tr('+', ' ') if u.query
+      if u.query && u.query.is_a?(String)
+        u.query = u.query.tr('+', ' ')
+      end
       str = u.to_s.force_encoding("ASCII-8BIT").gsub(URIREGEX[:unescape]) do |code|
         [code.delete('%')].pack('H*')
       end
@@ -152,7 +157,9 @@ module PostRank
     # interpreted as UTF-8.
     def unescape_unreserved(uri)
       u = parse(uri)
-      u.query = u.query.tr('+', ' ') if u.query
+      if u.query && u.query.is_a?(String)
+        u.query = u.query.tr('+', ' ')
+      end
       str = u.to_s.force_encoding("ASCII-8BIT").gsub(URIREGEX[:unescape]) do |code|
         next code if ENCODED_RESERVED_CHARS.include?(code.upcase)
 
@@ -176,9 +183,11 @@ module PostRank
 
     def normalize(uri, opts = {})
       u = parse(uri, opts)
-      u.path = u.path.squeeze('/')
-      u.path = u.path.chomp('/') if u.path.size != 1 && opts.fetch(:remove_trailing_slash, true)
-      u.query = nil if u.query && u.query.empty?
+      u.path = u.path.squeeze('/') if u.path
+      u.path = u.path.chomp('/') if u.path && u.path.size != 1 && opts.fetch(:remove_trailing_slash, true)
+      if u.query
+        u.query = nil if u.query.empty? || (u.query.is_a?(String) && u.query.strip.empty?)
+      end
       u.fragment = nil
       u
     end
@@ -193,8 +202,10 @@ module PostRank
       if q = u.query_values(Array)
         q.delete_if { |k,v| C14N[:global].include?(k) }
         q.delete_if { |k,v| C14N[:hosts].find {|r,p| u.host =~ r && p.include?(k) } }
+        u.query_values = q.empty? ? nil : q
+      else
+        u.query_values = nil
       end
-      u.query_values = q
 
       if u.host =~ /^(mobile\.)?twitter\.com$/ && u.fragment && u.fragment.match(/^!(.*)/)
         u.fragment = nil
@@ -246,6 +257,18 @@ module PostRank
       end
 
       uri.scheme = 'http' if uri.host && !uri.scheme
+      
+      # Ensure query is a String or nil before normalize! (addressable 2.8.8 compatibility)
+      if uri.query && !uri.query.is_a?(String)
+        uri.query = uri.query.to_s
+      end
+      
+      # Clear normalized_query cache before normalize! to avoid Module issues (addressable 2.8.8)
+      # normalized_query may cache Addressable::URI::NONE (Module) which causes TypeError
+      if uri.instance_variable_defined?(:@normalized_query)
+        uri.remove_instance_variable(:@normalized_query)
+      end
+      
       uri.normalize!
     end
 
