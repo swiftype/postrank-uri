@@ -1,5 +1,10 @@
 # Swiftype Fork of Postrank::URI Changelog
 
+### 1.0.22.swiftype05 / 2026-04-16
+
+* Add support for addressable 2.9.0
+
+
 ### 1.0.22.swiftype04 / 2026-01-22
 
 * Add support for addressable 2.8.8
