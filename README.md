@@ -45,7 +45,11 @@ Detecting "duplicate URLs" is a hard problem to solve (expensive in all senses),
 
 ### Setup
 
+For ruby version 2.5.5:
+
 ```
+CPPFLAGS=-DUSE_FFI_CLOSURE_ALLOC rbenv install
+gem install bundler -v 2.3.27
 bundle install
 ```
 

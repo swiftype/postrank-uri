@@ -1,5 +1,5 @@
 module PostRank
   module URI
-    VERSION = "1.0.22.swiftype04"
+    VERSION = "1.0.22.swiftype05"
   end
 end
